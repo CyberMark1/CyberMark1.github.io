@@ -1,0 +1,43 @@
+service: icybermind
+runtime: php55
+api_version: 1
+env: standard
+threadsafe: false
+
+automatic_scaling:
+  min_idle_instances: automatic
+  max_idle_instances: 1
+  min_pending_latency: 30ms
+  max_pending_latency: 3000ms
+  max_concurrent_requests: 80
+
+instance_class: F1
+
+handlers:
+
+  - url: /index.html
+    static_files: index.html
+    upload: index.html
+
+  - url: /(.*)\.php$
+    script: \1.php
+
+  - url: /media/ming/(.*)\.gif$
+    static_files: media/ming/\1.gif
+    upload: media/ming/(.*)\.gif$
+
+  - url: /media/ming2/(.*)
+    static_files: media/ming2/\1.gif
+    upload: media/ming2/(.*)\.gif$
+
+  - url: /(.*)
+    static_files: \1
+    upload: (.*)
+
+
+skip_files:
+    
+- media/hexscans/Desktop Text Data
+- .git/
+- domains_ming.sql
+
