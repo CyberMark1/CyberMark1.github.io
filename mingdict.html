@@ -31,8 +31,23 @@
 				font-weight: 300;
 				text-align: center;
 				content: attr(alt);
-				outline: 1px solid red;
+				outline: 1px solid blue;
 				margin-bottom: 1em;
+			}
+			img[alt].not-mingchr:after {
+				outline: 1px solid red !important;
+			}
+			.ming {}
+			.mingchr {
+				position: relative;
+				display: inline-block;
+				vertical-align: middle;
+			}
+			.not-mingchr {
+				position: relative;
+				display: inline-block;
+				vertical-align: middle;				
+				outline: 1px solid red !important;
 			}
 
 			.alternative {
@@ -155,10 +170,11 @@
 			//var hostname = '//';
 
 			function mingTranslate() {
-				var ot = '', row, i, l, ll, mings, chr, nm,
+				var ot = '', row, i, l, ll, mings, chr, nm, title, cls,
 						mingIn = document.getElementById('mingIn').value,
 						s = '',
-						result = []
+						result = [],
+						found = {}
 						;
 
 				document.getElementById('MingOut').innerHTML = '';
@@ -169,11 +185,27 @@
 					return;
 				
 				mings = mingIn.split(' ');
+
+				// Run the query
 				for (i = 0, l = mings.length; i < l; i++) {
 					mings[i] = (mings[i] || 'unknown').toUpperCase();
+					for (j = 0, ll = mingdict.length; j < ll; j++) {
+						row = mingdict[j];
+						if (row.mingword === mings[i]) {
+							result.push(row);
+							row.name = mings[i];
+							found[row.name] = row;
+						}
+					}
+				}
+
+				// Display images
+				for (i = 0, l = mings.length; i < l; i++) {
 					chr = mings[i];
 					nm = (chr + '.gif').toLowerCase();
-					s += ' ' + '<img src="' + hostname + '/media/ming/' + nm + '" alt="' + chr + '" title="' + chr + '" xonerror="this.style.display=\'none\'">';
+					title = found[chr] ? chr : 'could not find ' + chr;
+					cls = found[chr] ? 'mingchr' : 'not-mingchr';
+					s += ' ' + '<img class="' + cls + '" src="' + hostname + '/media/ming/' + nm + '" alt="' + chr + '" title="' + title + '">';
 				}
 				document.getElementById('MingChars').innerHTML = s;
 
@@ -186,17 +218,6 @@
 				ot += '<td align="left"><b>English</b></td>';
 				ot += '<td align="left"><b>Verse</b></td>';
 				ot += '</tr>';
-
-				// Run the query
-				for (i = 0, l = mings.length; i < l; i++) {
-					for (j = 0, ll = mingdict.length; j < ll; j++) {
-						row = mingdict[j];
-						if (row.mingword === mings[i]) {
-							result.push(row);
-							row.name = mings[i];
-						}
-					}
-				}
 
 				for (i = 0, l = result.length; i < l; i++) {
 					row = result[i];
