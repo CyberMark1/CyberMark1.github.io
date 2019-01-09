@@ -133,7 +133,10 @@
 			<textarea id="mingIn" name="mingIn" cols="50" rows="3" placeholder="type ming to translate here"></textarea>
 		</p>
 		<p> 
-			<big><button id="Translate" onclick="mingTranslate()">TRANSLATE</button></big>
+			<big>
+				<button id="Translate" onclick="mingTranslate()">TRANSLATE MING TO ENGLISH (default)</button>
+				<button id="Translate" onclick="engTranslate()">TRANSLATE ENGLISH TO MING</button>
+			</big>
 		</p>
 
 		<p><strong><font color="#33CC99">USE THE ENGLISH COLUMN BELOW FOR THE TRANSLATION 
@@ -173,20 +176,59 @@
 		<script>
 			var hostname = 'http://icybermind.net';
 			//var hostname = '//';
+			
+			function mingOut(result, toEnglish) {
+				var ot = '', i, l, row, nm;
+
+				document.getElementById('MingOut').innerHTML = '';
+
+
+				ot += '<table align="left" ';
+				ot += 'cellspacing="0" cellpadding="5">';
+				ot += '<tr>';
+				ot += '<td align="left"></td>';
+				ot += '<td align="left"><b>Ming  </b></td>';
+				ot += '<td align="left"><b>English</b></td>';
+				ot += '<td align="left"><b>Verse</b></td>';
+				ot += '</tr>';
+
+				for (i = 0, l = result.length; i < l; i++) {
+					row = result[i];
+					nm = (row.name + '.gif').toLowerCase();
+					ot += '<tr>';
+					if (toEnglish)
+						ot += '<td><img class="smallimg" src="img" alt="' + row.name + '" title="' + row.name + '"></td>';
+					else
+						ot += '<td><img class="smallimg" src="' + hostname + '/media/ming/' + nm + '" alt="' + row.name + '" title="' + row.name + '"></td>';
+					ot += '<td align="left">' + row.mingword + '</td>';
+					if (row.altenglish)
+						ot += '<td align="left"><span class="alternative" title="alternatively: ' + row.altenglish + '">' + row.english + '</span></td>';
+					else
+						ot += '<td align="left">' + row.english + '</td>';
+					ot += '<td align="left">' + row.abseyyao + '</td>';
+					ot += '</tr>';
+
+				}
+
+				ot += '</table>';
+
+				document.getElementById('MingOut').innerHTML = ot;				
+			}
 
 			function mingTranslate() {
-				var ot = '', row, i, l, ll, mings, chr, nm, title, cls,
+				var ot = '', row, i, l, j, ll, mings, chr, nm, title, cls,
 						mingIn = document.getElementById('mingIn').value,
 						s = '',
 						result = [],
 						found = {}
 						;
 
-				document.getElementById('MingOut').innerHTML = '';
 				mingIn = mingIn.replace(/[\r\n,]+/g, ' ').replace(/ +/g, ' ').replace(/^ | $/g, '');
 				
-				if (mingIn === '')
+				if (mingIn === '') {
+					document.getElementById('MingChars').innerHTML = '';
 					return;
+				}
 				
 				mings = mingIn.split(' ');
 
@@ -213,37 +255,47 @@
 				}
 				document.getElementById('MingChars').innerHTML = s;
 
-
-				ot += '<table align="left" ';
-				ot += 'cellspacing="0" cellpadding="5">';
-				ot += '<tr>';
-				ot += '<td align="left"></td>';
-				ot += '<td align="left"><b>Ming  </b></td>';
-				ot += '<td align="left"><b>English</b></td>';
-				ot += '<td align="left"><b>Verse</b></td>';
-				ot += '</tr>';
-
-				for (i = 0, l = result.length; i < l; i++) {
-					row = result[i];
-					nm = (row.name + '.gif').toLowerCase();
-					ot += '<tr>';
-					ot += '<td><img class="smallimg" src="' + hostname + '/media/ming/' + nm + '" alt="' + row.name + '" title="' + row.name + '" xonerror="this.style.display=\'none\'"></td>';
-					ot += '<td align="left">' + row.mingword + '</td>';
-					if (row.altenglish)
-						ot += '<td align="left"><span class="alternative" title="alternatively: ' + row.altenglish + '">' + row.english + '</span></td>';
-					else
-						ot += '<td align="left">' + row.english + '</td>';
-					ot += '<td align="left">' + row.abseyyao + '</td>';
-					ot += '</tr>';
-
-				}
-
-				ot += '</table>';
-
-				document.getElementById('MingOut').innerHTML = ot;
+				mingOut(result);
 			}
 
-			document.getElementById('mingIn').addEventListener('keydown', function (e) {
+			function engTranslate() {
+				var row, i, l, ll, j, mings, rg,
+						mingIn = document.getElementById('mingIn').value,
+						result = [],
+						found = {}
+						;
+
+				mingIn = mingIn.replace(/[\r\n,]+/g, ' ').replace(/ +/g, ' ').replace(/^ | $/g, '');
+				
+				if (mingIn === '') {
+					document.getElementById('MingChars').innerHTML = '';
+					return;
+				}
+				
+				mings = mingIn.split(' ');
+
+				// Run the query
+				for (i = 0, l = mings.length; i < l; i++) {
+					mings[i] = (mings[i] || 'unknown').toUpperCase();
+					rg = new RegExp('\\b' + escapeRegExp(mings[i]) + '\\b', 'g');
+					for (j = 0, ll = mingdict.length; j < ll; j++) {
+						row = mingdict[j];
+						if (row.english.search(rg) >= 0 || row.abseyyao.indexOf(rg) >= 0) {
+							result.push(row);
+							row.name = mings[i];
+							found[row.name] = row;
+						}
+					}
+				}
+
+				mingOut(result, true);
+			}
+
+				function escapeRegExp(string) {
+				  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+				}
+	
+				document.getElementById('mingIn').addEventListener('keydown', function (e) {
 				if (e.which == 13) {
 					document.getElementById('Translate').click();
 				}
