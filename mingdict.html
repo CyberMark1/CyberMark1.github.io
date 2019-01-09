@@ -64,6 +64,11 @@
 				border-top: 1px solid #CCC;
 				font-size: 95%;
 			}
+			
+			#MingChars {
+				margin-bottom: 1em;
+				clear: both;
+			}
 
 			#MyLittleTooltip {
 				position: absolute;
@@ -179,7 +184,6 @@
 
 				document.getElementById('MingOut').innerHTML = '';
 				mingIn = mingIn.replace(/[\r\n,]+/g, ' ').replace(/ +/g, ' ').replace(/^ | $/g, '');
-				debugger;
 				
 				if (mingIn === '')
 					return;
