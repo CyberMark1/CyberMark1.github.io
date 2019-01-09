@@ -281,16 +281,28 @@
 
 				// Run the query
 				for (i = 0, l = mings.length; i < l; i++) {
+					var foundEnglish = false;
 					mings[i] = (mings[i] || 'unknown').toUpperCase();
 					rg = new RegExp('\\b' + escapeRegExp(mings[i]) + '\\b', 'ig');
 					for (j = 0, ll = mingdict.length; j < ll; j++) {
 						row = mingdict[j];
-						if (row.english.search(rg) >= 0 || row.abseyyao.search(rg) >= 0) {
+						if (row.english.search(rg) >= 0) {
 							result.push(row);
 							row.name = mings[i];
 							found[row.name] = row;
+							foundEnglish = true;
+							break;
 						}
 					}
+					if (!foundEnglish)
+						for (j = 0, ll = mingdict.length; j < ll; j++) {
+							row = mingdict[j];
+							if (row.abseyyao.search(rg) >= 0) {
+								result.push(row);
+								row.name = mings[i];
+								found[row.name] = row;
+							}
+						}
 				}
 
 				mingOut(result, true);
