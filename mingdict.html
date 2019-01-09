@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<script>
+			window.docVersion = 2.027;
+		</script>
 		<title>Ming Translator</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,7 +122,7 @@
 	</head>
 	<body>
 		<h2><strong><font color="#0033FF" size="3" face="Arial, Helvetica, sans-serif"><em>MING 
-					TRANSLATOR</em></font></strong></h2>
+					TRANSLATOR <small>&nbsp;&nbsp;(Version <span class="docVersion"></span>)</small></em></font></strong></h2>
 		<p><em><strong><font color="#0099FF" size="-1" face="Arial, Helvetica, sans-serif">While 
 					there are undoubtedly initiatory virtues obtained using the ming dictionary 
 					given in </font></strong></em></p>
@@ -181,6 +184,10 @@
 <script>
 	var hostname = 'http://icybermind.net';
 	//var hostname = '//';
+	
+	document.querySelectorAll('.docVersion').forEach(function(el) {
+		el.innerHTML = window.docVersion;
+	});
 
 	function mingClear() {
 		document.getElementById('MingChars').innerHTML = '';
